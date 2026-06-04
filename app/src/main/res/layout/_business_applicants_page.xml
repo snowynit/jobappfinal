@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundLight"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Applicants"
+        android:textColor="@color/gray_900"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Review resumes, respond quickly, and keep hiring moving."
+        android:textColor="@color/gray_600"
+        android:textSize="14sp" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/filterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:backgroundTint="@color/indigo_50"
+                android:paddingHorizontal="18dp"
+                android:text="All"
+                android:textAllCaps="false"
+                android:textColor="@color/gray_900"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/filterPending"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="@color/indigo_50"
+                android:paddingHorizontal="18dp"
+                android:text="Pending"
+                android:textAllCaps="false"
+                android:textColor="@color/gray_900"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/filterAccepted"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="@color/indigo_50"
+                android:paddingHorizontal="18dp"
+                android:text="Accepted"
+                android:textAllCaps="false"
+                android:textColor="@color/gray_900"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/filterRejected"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="@color/indigo_50"
+                android:paddingHorizontal="18dp"
+                android:text="Rejected"
+                android:textAllCaps="false"
+                android:textColor="@color/gray_900"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/emptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="No applicants in this view yet."
+        android:textColor="@color/gray_500"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/applicantsRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="80dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="20dp" />
+
+</LinearLayout>

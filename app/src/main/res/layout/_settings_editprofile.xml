@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Profile Header -->
+        <TextView
+            android:text="Edit Profile"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Profile Picture Section -->
+        <TextView
+            android:text="Profile Picture"
+            android:textStyle="bold"
+            android:textColor="#666"
+            android:layout_marginBottom="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="3dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/imgProfile"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/pfp"
+                    android:contentDescription="Profile Picture"
+                    android:scaleType="centerCrop"
+                    />
+
+                <Button
+                    android:id="@+id/btnChangeProfilePic"
+                    android:text="Change Picture"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/primaryBlue"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Personal Info Section -->
+        <TextView
+            android:text="Personal Info"
+            android:textStyle="bold"
+            android:textColor="#666"
+            android:layout_marginBottom="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            app:cardElevation="3dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/etAbout"
+                    android:hint="About You"
+                    android:minLines="3"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Job Preferences -->
+        <TextView
+            android:text="Job Preferences"
+            android:textStyle="bold"
+            android:textColor="#666"
+            android:layout_marginBottom="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/etPay"
+                    android:hint="Desired Pay (₪ / hour)"
+                    android:inputType="number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="Work Type"
+                    android:textStyle="bold"
+                    android:textColor="#666"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnFullTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:backgroundTint="@color/primaryBlue"
+                        android:text="Full Time"
+                        android:textSize="12dp"/>
+
+                    <Button
+                        android:id="@+id/btnPartTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:backgroundTint="@color/primaryBlue"
+                        android:text="Part Time"
+                        android:textSize="12dp"/>
+
+                    <Button
+                        android:id="@+id/btnTemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:backgroundTint="@color/primaryBlue"
+                        android:text="Temporary"
+                        android:textSize="12dp"/>
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/etFields"
+                    android:hint="Fields (e.g. developer, designer)"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/btnSaveProfile"
+            android:text="Save Changes"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#006CEF"
+            android:layout_marginBottom="60dp"/>
+    </LinearLayout>
+</ScrollView>

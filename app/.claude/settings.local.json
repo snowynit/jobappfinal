@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\nitay\\\\Downloads\\\\dew\\\\wow1\\\\app\\\\src\" -Recurse -File)",
+      "Bash(Select-Object FullName)"
+    ]
+  }
+}
