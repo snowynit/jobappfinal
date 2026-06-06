@@ -22,6 +22,7 @@ import com.example.myapplication.R;
 import com.example.myapplication.functions;
 import com.example.myapplication.mainapp_jobseeker.Adapter.Job;
 import com.example.myapplication.mainapp_jobseeker.Adapter.JobAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -104,6 +105,7 @@ public class JobSeekerSearchPage extends Fragment implements LocationPickerDialo
             }
         });
 
+        loadSavedLocation();
         loadJobsFromDatabase();
         return pageui;
     }
@@ -140,6 +142,32 @@ public class JobSeekerSearchPage extends Fragment implements LocationPickerDialo
                     loadingIndicator.setVisibility(View.GONE);
                     emptyText.setText("Failed to load jobs");
                     emptyText.setVisibility(View.VISIBLE);
+                });
+    }
+
+    private void loadSavedLocation() {
+        String userId = FirebaseAuth.getInstance().getUid();
+        if (userId == null) {
+            return;
+        }
+
+        FirebaseFirestore.getInstance().collection("users").document(userId)
+                .get()
+                .addOnSuccessListener(document -> {
+                    Boolean enabled = document.getBoolean("UseLocation");
+                    Double latitude = document.getDouble("PreferredLatitude");
+                    Double longitude = document.getDouble("PreferredLongitude");
+                    Double radius = document.getDouble("PreferredRadiusKm");
+
+                    if (!Boolean.TRUE.equals(enabled) || latitude == null || longitude == null) {
+                        return;
+                    }
+
+                    filterLat = latitude;
+                    filterLng = longitude;
+                    filterRadius = radius != null && radius > 0d ? radius : 10d;
+                    locationSummary.setText("Saved area: " + Math.round(filterRadius) + " km radius");
+                    filterJobs();
                 });
     }
 

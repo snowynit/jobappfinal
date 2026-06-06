@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Switch;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,7 +15,6 @@ import com.example.myapplication.functions;
 import com.example.myapplication.settings.AccountSettings;
 import com.example.myapplication.settings.Applied;
 import com.example.myapplication.settings.HelpCenter;
-import com.example.myapplication.settings.Location;
 import com.example.myapplication.settings.Notifications;
 import com.example.myapplication.settings.PrivacyPolicy;
 import com.example.myapplication.settings.ProfileInfo;
@@ -24,14 +22,12 @@ import com.example.myapplication.settings.ProfileInfo;
 public class JobSeekerSettingsPage extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View pageui = inflater.inflate(R.layout._js_nav_settingspage, container, false);
-        CardView accountset, profileinfo, applied, notifications, privacy, help;
-        Switch location;
+        CardView accountset, profileinfo, applied, notifications, location, privacy, help;
 
         accountset = pageui.findViewById(R.id.accountSettings);
         profileinfo = pageui.findViewById(R.id.profileInfo);
         applied = pageui.findViewById(R.id.applied);
         notifications = pageui.findViewById(R.id.notifications);
-        location = pageui.findViewById(R.id.locationSwitch);
         privacy = pageui.findViewById(R.id.privacyPolicy);
         help = pageui.findViewById(R.id.helpCenter);
 
@@ -46,9 +42,6 @@ public class JobSeekerSettingsPage extends Fragment {
         });
         notifications.setOnClickListener(v -> {
             new Notifications().show(getParentFragmentManager(), "notifications_dialog");
-        });
-        location.setOnClickListener(v -> {
-            functions.moveMain(this, new Location());
         });
 
         privacy.setOnClickListener(v -> {
