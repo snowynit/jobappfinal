@@ -66,6 +66,8 @@ public class BusinessRegisterPassword extends Fragment {
             data.put("Business Name", bundle.getString("Name"));
             data.put("Business Size", bundle.getString("Size"));
             data.put("Business Address", bundle.getString("Address"));
+            data.put("Business Latitude", bundle.getDouble("Latitude", 0d));
+            data.put("Business Longitude", bundle.getDouble("Longitude", 0d));
             data.put("Business Email", email);
             data.put("Business Phone", bundle.getString("Phone"));
             data.put("Business Pay", bundle.getString("Pay"));

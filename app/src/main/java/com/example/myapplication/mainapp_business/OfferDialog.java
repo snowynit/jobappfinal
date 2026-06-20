@@ -30,6 +30,7 @@ public class OfferDialog extends DialogFragment {
     private static final String ARG_SEEKER_ID = "seekerId";
     private static final String ARG_SEEKER_NAME = "seekerName";
 
+    // יצירת חלון חדש עם המזהה והשם של המועמד
     public static OfferDialog newInstance(String seekerId, String seekerName) {
         OfferDialog dialog = new OfferDialog();
         Bundle args = new Bundle();
@@ -70,6 +71,7 @@ public class OfferDialog extends DialogFragment {
         return root;
     }
 
+    // שולח את ההצעה לפיירסטור (אוסף שדות העסק והודעה ושומר באוסף offers)
     private void sendOffer(String seekerId, String seekerName, String jobTitle, String message) {
         if (seekerId.isEmpty()) {
             Toast.makeText(getContext(), "Missing candidate ID.", Toast.LENGTH_SHORT).show();

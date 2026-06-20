@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -60,17 +61,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class functions {
-    // create user
+    // חיבור לפיירסטור
     private static final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    //        password checker
+    // בודק אם שתי הסיסמאות זהות
     public static boolean passwordmatch(EditText password, EditText confirm) {
 
 
         return password.getText().toString().equals(confirm.getText().toString());
     }
 
-    //    show/hide password
+    // מציג / מסתיר את הסיסמה
     public static void show(EditText pass, EditText confirm) {
         pass.setTransformationMethod(null);
         confirm.setTransformationMethod(null);
@@ -81,13 +82,13 @@ public class functions {
         confirm.setTransformationMethod(new PasswordTransformationMethod());
     }
 
-    //    fields filled personal
+    // בודק שהשדות בהרשמה אישית מלאים
     public static boolean Personalfilled(EditText name, EditText email) {
 
         return !name.getText().toString().isEmpty() && !email.getText().toString().isEmpty();
     }
 
-    //    fields filled business
+    // בודק שהשדות בהרשמה של עסק מלאים
     public static boolean Businessfilled(String name, String email, String address, String size, String pay,
                                          ArrayList<String> needs, ArrayList<String> rate) {
 
@@ -95,7 +96,7 @@ public class functions {
                 !size.isEmpty() && !pay.isEmpty() && needs != null && rate != null;
     }
 
-    //move to new fragment
+    // מעבר ל-fragment חדש במסך ההתחברות
     public static void move(Fragment currentFrag, Fragment targetFrag, @Nullable Bundle bundle) {
         if (bundle != null) {
             targetFrag.setArguments(bundle);
@@ -110,7 +111,7 @@ public class functions {
                 .addToBackStack(null)
                 .commit();
     }
-//move in the app
+    // מעבר בתוך האפליקציה הראשית (מתוך Activity)
     public static void moveApp(AppCompatActivity activity, Fragment fragment) {
         activity.getSupportFragmentManager()
                 .beginTransaction()
@@ -121,7 +122,7 @@ public class functions {
                 .addToBackStack(null)
                 .commit();
     }
-    // move inside the main activity fragments
+    // מעבר בין fragments בתוך האפליקציה הראשית
     public static void moveMain(Fragment frag, Fragment fragment) {
         frag.requireActivity().getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(
@@ -131,7 +132,7 @@ public class functions {
                 .addToBackStack(null)
                 .commit();
     }
-    // move inside the main activity with data
+    // אותו דבר אבל מעביר גם נתונים ב-Bundle
     public static void moveMain(Fragment frag, Fragment fragment, @Nullable Bundle bundle) {
         if (bundle != null) {
             fragment.setArguments(bundle);
@@ -145,7 +146,7 @@ public class functions {
                 .commit();
     }
 
-    // open the right home page based on the user's account type
+    // פותח את האפליקציה הנכונה לפי סוג המשתמש (עסק / מחפש עבודה)
     public static void moveByType(AppCompatActivity activity, String id) {
         FirebaseFirestore.getInstance().collection("users").document(id).get().addOnSuccessListener(document -> {
             if (document.exists()) {
@@ -176,12 +177,12 @@ public class functions {
         });
     }
 
-    // same thing but from inside a fragment
+    // אותו דבר אבל קוראים מ-Fragment
     public static void moveByType(Fragment fragment, String id) {
         moveByType((AppCompatActivity) fragment.requireActivity(), id);
     }
 
-    //  password not matching alert
+    // הודעת שגיאה כשהסיסמאות לא תואמות
     public static void alert(TextView alert) {
         alert.setVisibility(View.GONE);
         alert.setText("Passwords Do Not Match!");
@@ -189,7 +190,7 @@ public class functions {
         return;
     }
 
-    // create the firebase account and save the user info to firestore
+    // יוצר משתמש חדש בפיירבייס ושומר את הפרטים שלו בפיירסטור
     public static void register(String email, String password, Map<String, Object> data, OnCompleteListener<Void> listener, OnCompleteListener<AuthResult> authlistener) {
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             authlistener.onComplete(task);
@@ -204,7 +205,42 @@ public class functions {
         });
     }
 
-    // defines the button state
+    // מחבר ללחיצה את שינוי הצבע של הכפתור
+    // sends reset password email
+    public static void sendPasswordReset(Fragment fragment, String email, TextView alert, TextView button, String normalText) {
+        if (email.isEmpty()) {
+            alert.setVisibility(View.VISIBLE);
+            alert.setText("Please enter your email first.");
+            return;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            alert.setVisibility(View.VISIBLE);
+            alert.setText("Please enter a valid email.");
+            return;
+        }
+
+        alert.setVisibility(View.GONE);
+        button.setEnabled(false);
+        button.setText("Sending...");
+        AlertDialog loading = showLoading(fragment, "Sending reset link...");
+
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                .addOnSuccessListener(unused -> {
+                    hideLoading(loading);
+                    button.setEnabled(true);
+                    button.setText(normalText);
+                    Toast.makeText(fragment.getContext(), "Reset link sent to your email.", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    hideLoading(loading);
+                    button.setEnabled(true);
+                    button.setText(normalText);
+                    alert.setVisibility(View.VISIBLE);
+                    alert.setText(e.getMessage() == null ? "Failed to send reset email." : e.getMessage());
+                });
+    }
+
     public static void pressed(Button button) {
         if (button == null) {
             return;
@@ -217,39 +253,39 @@ public class functions {
         pressed(button);
     }
 
-    // changes the button color depending on state
+    // צובע את הכפתור לפי האם הוא נבחר או לא
     public static void styleButton(Button button, boolean isSelected) {
         if (button == null) {
             return;
         }
         button.setSelected(isSelected);
+        button.setBackgroundTintList(null);
+        button.setAlpha(1f);
 
         int blue = Color.parseColor("#2563EB");
-        int bg = isSelected ? blue : Color.parseColor("#EEF2FF");
-        int text = isSelected ? Color.WHITE : blue;
+        float density = button.getResources().getDisplayMetrics().density;
 
-        float radius = 12 * button.getResources().getDisplayMetrics().density;
         GradientDrawable shape = new GradientDrawable();
-        shape.setColor(bg);
-        shape.setCornerRadius(radius);
-        shape.setStroke(1, blue);
-
-        button.setBackground(shape);
-        button.setTextColor(text);
+        shape.setCornerRadius(14 * density);
 
         if (isSelected) {
-            button.setAlpha(1f);
+            shape.setColor(blue);
+            button.setTextColor(Color.WHITE);
         } else {
-            button.setAlpha(.95f);
+            shape.setColor(Color.WHITE);
+            shape.setStroke((int) density, Color.parseColor("#E5E7EB"));
+            button.setTextColor(Color.parseColor("#111827"));
         }
+
+        button.setBackground(shape);
     }
 
-    // null-safe lowercase
+    // מחזיר את הטקסט באותיות קטנות (גם אם זה null)
     public static String safeLower(String value) {
         return value == null ? "" : value.toLowerCase(Locale.ROOT);
     }
 
-    // returns the first non-empty value from the list (handles different firestore field names)
+    // מחזיר את הערך הראשון שלא ריק (פיירסטור לפעמים שולח שמות שדות שונים)
     public static String getValue(String... values) {
         for (String value : values) {
             if (value != null && !value.trim().isEmpty()) {
@@ -259,7 +295,7 @@ public class functions {
         return "";
     }
 
-    // pulls the first string out of a firestore array field
+    // לוקח את הערך הראשון מתוך רשימה של פיירסטור
     public static String firstFromList(Object value) {
         if (value instanceof List && !((List<?>) value).isEmpty()) {
             Object first = ((List<?>) value).get(0);
@@ -268,7 +304,7 @@ public class functions {
         return "";
     }
 
-    // build a Job object from a firestore document (handles different field name versions)
+    // בונה אובייקט Job מתוך מסמך של פיירסטור
     public static Job mapJobDocument(DocumentSnapshot document) {
         Job job = new Job();
         job.id = document.getId();
@@ -361,7 +397,7 @@ public class functions {
         return job;
     }
 
-    // pack a job into a Bundle so we can pass it between fragments
+    // אורז Job בתוך Bundle כדי להעביר בין fragments
     public static Bundle jobToBundle(Job job) {
         Bundle bundle = new Bundle();
         bundle.putString("job_id", job.id);
@@ -389,7 +425,7 @@ public class functions {
         return bundle;
     }
 
-    // unpack a job back out of a Bundle
+    // מוציא בחזרה Job מתוך Bundle
     public static Job jobFromBundle(Bundle bundle) {
         Job job = new Job();
         job.id = bundle.getString("job_id", "");
@@ -417,7 +453,7 @@ public class functions {
         return job;
     }
 
-    // get a readable file name from a content uri (used for resume uploads)
+    // מקבל את שם הקובץ מ-URI (שימושי בהעלאת קורות חיים)
     public static String getDisplayName(Context context, Uri uri) {
         if (uri == null) {
             return "";
@@ -437,7 +473,7 @@ public class functions {
         return getValue(uri.getLastPathSegment(), "Selected file");
     }
 
-    // show an image from a saved uri, fall back to placeholder if missing
+    // מציג תמונה מ-URI, אם אין מציג תמונת ברירת מחדל
     public static void loadImageUri(ImageView imageView, String uriString, int fallbackRes) {
         if (uriString == null || uriString.trim().isEmpty()) {
             imageView.setImageResource(fallbackRes);
@@ -451,7 +487,7 @@ public class functions {
         }
     }
 
-    // keep a gallery/file uri readable after the app restarts
+    // שומר הרשאת קריאה ל-URI גם אחרי שהאפליקציה נסגרת
     public static void persistReadPermission(Context context, Uri uri) {
         if (context == null || uri == null) {
             return;
@@ -466,7 +502,7 @@ public class functions {
         }
     }
 
-    // copy a picked image into the app's private folder and return its local uri
+    // מעתיק תמונה שנבחרה לתיקייה הפנימית של האפליקציה
     public static String saveImageToAppStorage(Context context, Uri sourceUri) {
         if (context == null || sourceUri == null) {
             return "";
@@ -499,7 +535,7 @@ public class functions {
         }
     }
 
-    // save the picked image and show it in the preview
+    // שומר את התמונה שנבחרה ומציג אותה במקום הנכון
     public static String pickImage(Context context, Uri uri, ImageView imageView, int fallbackRes) {
         String localUri = saveImageToAppStorage(context, uri);
         if (!localUri.isEmpty()) {
@@ -508,7 +544,7 @@ public class functions {
         return localUri;
     }
 
-    // split comma-separated text into a clean list
+    // הופך טקסט עם פסיקים לרשימה נקייה
     public static List<String> splitFields(String value) {
         if (value == null || value.trim().isEmpty()) {
             return new ArrayList<>();
@@ -525,7 +561,7 @@ public class functions {
         return fields;
     }
 
-    // simple score for how well a job matches the user's preferences
+    // ציון פשוט שמסתכל כמה משרה מתאימה להעדפות של המשתמש
     public static int recommendationScore(Job job, String preferredType, String fields, String desiredPay) {
         int score = 0;
         String jobType = safeLower(job.type).replace("-", "_").replace(" ", "_");
@@ -558,7 +594,7 @@ public class functions {
         return score;
     }
 
-    // pull just the digits out of a string (so "₪80/hr" -> 80)
+    // לוקח רק את המספרים מתוך טקסט (לדוגמה "₪80/hr" → 80)
     public static int extractNumber(String value) {
         if (value == null) {
             return 0;
@@ -574,7 +610,7 @@ public class functions {
         }
     }
 
-    // sort jobs by best match first
+    // ממיין משרות לפי הציון הכי גבוה קודם
     public static void sortRecommendedJobs(List<Job> jobs, String preferredType, String fields, String desiredPay) {
         Collections.sort(jobs, (first, second) -> Integer.compare(
                 recommendationScore(second, preferredType, fields, desiredPay),
@@ -582,7 +618,7 @@ public class functions {
         ));
     }
 
-    // true if the user has a resume built inside the app
+    // בודק אם המשתמש בנה קו"ח בתוך האפליקציה
     public static boolean hasBuiltResume(DocumentSnapshot document) {
         if (document == null) {
             return false;
@@ -590,7 +626,7 @@ public class functions {
         return !getValue(document.getString("ResumeText"), "").isEmpty();
     }
 
-    // true if the user uploaded a resume file
+    // בודק אם המשתמש העלה קובץ קו"ח
     public static boolean hasUploadedResume(DocumentSnapshot document) {
         if (document == null) {
             return false;
@@ -598,7 +634,7 @@ public class functions {
         return !getValue(document.getString("ResumeUri"), "").isEmpty();
     }
 
-    // pick a label to show for the user's resume
+    // בוחר כיתוב להצגה לקו"ח של המשתמש
     public static String getResumeLabel(DocumentSnapshot document) {
         if (document == null) {
             return "No resume selected";
@@ -613,7 +649,7 @@ public class functions {
         return "No resume selected";
     }
 
-    // glue all resume sections together into one text block
+    // מחבר את כל החלקים של הקו"ח לטקסט אחד
     public static String buildResumeText(String fullName,String headline,String phone,String email,String location,String summary,String skills,String experience,String education,String languages) {
         StringBuilder builder = new StringBuilder();
 
@@ -643,7 +679,7 @@ public class functions {
         return builder.toString().trim();
     }
 
-    // helper: add a titled section to the resume
+    // עוזר: מוסיף קטע עם כותרת לקו"ח
     private static void appendLabeledSection(StringBuilder builder, String title, String body) {
         String safeBody = getValue(body, "");
         if (safeBody.isEmpty()) {
@@ -655,7 +691,7 @@ public class functions {
         builder.append(title).append("\n").append(safeBody.trim());
     }
 
-    // helper: add a plain line (like the name or contact row) to the resume
+    // עוזר: מוסיף שורה רגילה (כמו שם או טלפון) לקו"ח
     private static void appendResumeSection(StringBuilder builder, String value) {
         String safeValue = getValue(value, "");
         if (safeValue.isEmpty()) {
@@ -667,7 +703,7 @@ public class functions {
         builder.append(safeValue.trim());
     }
 
-    // turn "java, kotlin, swift" into "java • kotlin • swift"
+    // הופך "java, kotlin, swift" ל-"java • kotlin • swift"
     public static String normalizeResumeList(String value) {
         String safeValue = getValue(value, "");
         if (safeValue.isEmpty()) {
@@ -685,7 +721,7 @@ public class functions {
         return joinWithSeparator(cleaned, " \u2022 ");
     }
 
-    // join strings with a separator, skipping empty ones
+    // מחבר טקסטים עם מפריד ביניהם
     public static String joinWithSeparator(List<String> values, String separator) {
         StringBuilder builder = new StringBuilder();
         for (String value : values) {
@@ -700,7 +736,7 @@ public class functions {
         return builder.toString();
     }
 
-    // first value that can be read as a number (handles strings and numbers from firestore)
+    // מחזיר את הערך הראשון שאפשר להמיר למספר
     public static double firstDouble(Object... values) {
         for (Object value : values) {
             if (value == null) {
@@ -717,13 +753,13 @@ public class functions {
         return 0d;
     }
 
-    // true if the user has given the app location permission
+    // בודק אם המשתמש אישר הרשאת מיקום
     public static boolean hasLocationPermission(Context context) {
         return context != null &&
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    // grab the freshest known location from gps or network
+    // מביא את המיקום האחרון הידוע מ-GPS או מהרשת
     public static Location getBestLastLocation(Context context) {
         if (context == null || !hasLocationPermission(context)) {
             return null;
@@ -757,7 +793,7 @@ public class functions {
         return network;
     }
 
-    // ask for a single location update from gps + network
+    // מבקש עדכון מיקום חד-פעמי מ-GPS + רשת
     public static boolean askForOneLocation(Context context, LocationListener listener) {
         if (context == null || listener == null || !hasLocationPermission(context)) {
             return false;
@@ -773,7 +809,7 @@ public class functions {
         return gps || network;
     }
 
-    // helper: ask one provider for a single location
+    // עוזר: מבקש מיקום מ-provider אחד
     private static boolean askProvider(LocationManager manager, String provider, LocationListener listener) {
         try {
             if (!manager.isProviderEnabled(provider)) {
@@ -786,7 +822,7 @@ public class functions {
         }
     }
 
-    // stop listening for location updates
+    // מפסיק להאזין לעדכוני מיקום
     public static void stopLocation(Context context, LocationListener listener) {
         if (context == null || listener == null) {
             return;
@@ -800,7 +836,7 @@ public class functions {
         }
     }
 
-    // true if the job is within the chosen radius from the selected point
+    // בודק אם המשרה בתוך הרדיוס שבחרנו מהמיקום
     public static boolean jobInRadius(Job job, double lat, double lng, double radiusKm) {
         if (job == null || radiusKm <= 0d) {
             return true;
@@ -814,7 +850,7 @@ public class functions {
         return result[0] <= radiusKm * 1000d;
     }
 
-    // build a Job from an application document (so the same UI can show both jobs and applications)
+    // בונה Job ממסמך של מועמדות (ככה אפשר להציג אותם ברשימה)
     public static Job mapApplicationDocument(DocumentSnapshot document) {
         Job job = new Job();
         job.id = document.getId();
@@ -839,7 +875,7 @@ public class functions {
         return job;
     }
 
-    // show a simple loading dialog with a spinner and a message
+    // מציג חלון טעינה עם גלגל וטקסט
     public static AlertDialog showLoading(Fragment fragment, String message) {
         if (fragment == null || fragment.getContext() == null) {
             return null;
@@ -871,14 +907,14 @@ public class functions {
         return dialog;
     }
 
-    // dismiss the loading dialog
+    // סוגר את חלון הטעינה
     public static void hideLoading(AlertDialog dialog) {
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
     }
 
-    // sign the user out of firebase
+    // יוצא מהחשבון של פיירבייס
     public static void logout(Fragment frag) {
         FirebaseAuth.getInstance().signOut();
     }

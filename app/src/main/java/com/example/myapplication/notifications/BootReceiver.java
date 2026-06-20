@@ -6,6 +6,7 @@ import android.content.Intent;
 
 public class BootReceiver extends BroadcastReceiver {
 
+    // נקרא אחרי reboot של המכשיר — מחזיר את ההתראה היומית (כי alarms נמחקים בכיבוי)
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent == null || intent.getAction() == null) {

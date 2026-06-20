@@ -28,6 +28,7 @@ public final class NotificationHelper {
 
     private NotificationHelper() {}
 
+    // יוצר את הערוץ של ההתראות (חובה מ-Android 8)
     public static void ensureChannels(Context context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return;
@@ -42,6 +43,7 @@ public final class NotificationHelper {
         manager.createNotificationChannel(reminders);
     }
 
+    // בונה ושולח התראה למשתמש
     public static void post(Context context, String channelId, int notifId, String title, String body) {
         ensureChannels(context);
 
@@ -68,6 +70,7 @@ public final class NotificationHelper {
         }
     }
 
+    // קיצור לגישה ל-SharedPreferences של ההתראות
     public static SharedPreferences prefs(Context context) {
         return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }

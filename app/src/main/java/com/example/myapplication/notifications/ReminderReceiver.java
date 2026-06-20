@@ -12,6 +12,7 @@ public class ReminderReceiver extends BroadcastReceiver {
 
     public static final String ACTION_DAILY_REMINDER = "com.example.myapplication.ACTION_DAILY_REMINDER";
 
+    // נקרא כש-AlarmManager שולח Broadcast — בודק מי המשתמש ושולח התראה מתאימה
     @Override
     public void onReceive(Context context, Intent intent) {
         SharedPreferences prefs = NotificationHelper.prefs(context);

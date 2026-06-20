@@ -43,7 +43,10 @@ public class LoginPage extends Fragment {
             }
         });
 
-        reset.setOnClickListener(view -> functions.move(this, new ForgotPassword(), null));
+        reset.setOnClickListener(view -> {
+            String emailValue = email.getText().toString().trim();
+            functions.sendPasswordReset(this, emailValue, alert, reset, "Forgot password?");
+        });
 
         signin.setOnClickListener(view -> {
             String emailValue = email.getText().toString().trim();

@@ -49,6 +49,10 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAj_aQs0o6Y58jmducEqVPGSncMuY2WB78" />
+
         <receiver
             android:name=".notifications.ReminderReceiver"
             android:exported="false"/>

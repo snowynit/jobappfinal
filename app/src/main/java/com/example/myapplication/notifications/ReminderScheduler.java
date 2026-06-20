@@ -17,6 +17,7 @@ public final class ReminderScheduler {
 
     private ReminderScheduler() {}
 
+    // שומר את ההגדרות ומתזמן את ההתראה היומית
     public static void saveAndSchedule(Context context, boolean enabled, int hour, int minute) {
         SharedPreferences.Editor editor = NotificationHelper.prefs(context).edit();
         editor.putBoolean(NotificationHelper.KEY_REMINDERS_ENABLED, enabled);
@@ -31,6 +32,7 @@ public final class ReminderScheduler {
         }
     }
 
+    // מתזמן את ההתראה לפי השעה ששמורה ב-SharedPreferences (נקרא בעלייה של האפליקציה ואחרי reboot)
     public static void scheduleFromPrefs(Context context) {
         SharedPreferences prefs = NotificationHelper.prefs(context);
         if (!prefs.getBoolean(NotificationHelper.KEY_REMINDERS_ENABLED, false)) {
@@ -41,6 +43,7 @@ public final class ReminderScheduler {
         schedule(context, hour, minute);
     }
 
+    // קובע ל-AlarmManager לירות כל יום בשעה שנבחרה
     private static void schedule(Context context, int hour, int minute) {
         AlarmManager alarmManager = ContextCompat.getSystemService(context, AlarmManager.class);
         if (alarmManager == null) {
@@ -64,6 +67,7 @@ public final class ReminderScheduler {
         );
     }
 
+    // מבטל את ההתראה היומית
     public static void cancel(Context context) {
         AlarmManager alarmManager = ContextCompat.getSystemService(context, AlarmManager.class);
         if (alarmManager != null) {

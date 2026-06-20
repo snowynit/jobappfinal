@@ -46,6 +46,7 @@ public class JobSeekerOffersPage extends Fragment implements OffersAdapter.OnOff
         return pageui;
     }
 
+    // טוען את ההצעות שמיועדות למשתמש הנוכחי
     private void loadOffers() {
         String userId = FirebaseAuth.getInstance().getUid();
         if (userId == null) {
@@ -84,6 +85,7 @@ public class JobSeekerOffersPage extends Fragment implements OffersAdapter.OnOff
                 });
     }
 
+    // מעדכן את הסטטוס של ההצעה בפיירסטור (אושר / נדחה)
     private void updateStatus(Offer offer, String status) {
         AlertDialog loading = functions.showLoading(this, "Updating offer...");
         FirebaseFirestore.getInstance().collection("offers").document(offer.id)

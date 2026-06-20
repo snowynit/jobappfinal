@@ -49,26 +49,43 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="16dp"/>
 
-        <EditText
-            android:id="@+id/businessSize"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:hint="Number of Employees"
-            android:padding="12dp"
-            android:textSize="20sp"
+        <TextView
+            android:id="@+id/businessLocationLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Business location"
+            android:textColor="#374151"
+            android:textSize="14sp"
+            android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/businessName"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="6dp"/>
 
-        <EditText
+        <TextView
             android:id="@+id/businessAddress"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:hint="Business Address"
-            android:textSize="20sp"
-            android:padding="12dp"
-            app:layout_constraintTop_toBottomOf="@id/businessSize"
+            android:background="#F3F4F6"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            android:text="Location not selected"
+            android:textColor="#374151"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/businessLocationLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/setBusinessLocationButton"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:backgroundTint="@color/blue_600"
+            android:text="Pick on map"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/businessAddress"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="24dp"/>
@@ -82,7 +99,7 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="#000000"
-            app:layout_constraintTop_toBottomOf="@id/businessAddress"
+            app:layout_constraintTop_toBottomOf="@id/setBusinessLocationButton"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginBottom="16dp"/>
 
@@ -134,33 +151,36 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="24dp">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/fulltime"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:text="Full-Time"
-                android:backgroundTint="#F3F4F6"
-                android:textColor="#0A1A44"/>
+                android:textSize="12sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/halftime"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_weight="1"
                 android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:text="Part-Time"
-                android:backgroundTint="#F3F4F6"
-                android:textColor="#0A1A44"/>
+                android:textSize="12sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/temporary"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:text="Temporary"
-                android:backgroundTint="#F3F4F6"
-                android:textColor="#0A1A44"/>
+                android:textSize="12sp" />
         </LinearLayout>
 
         <!-- Wage -->
@@ -188,24 +208,26 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="24dp">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/daily"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:backgroundTint="#F3F4F6"
                 android:layout_marginRight="50dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:text="daily"
-                android:textColor="#0A1A44" />
+                android:textSize="12sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/hourly"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:text="hourly"
-                android:backgroundTint="#F3F4F6"
-                android:textColor="#0A1A44"/>
+                android:textSize="12sp" />
 
         </LinearLayout>
 

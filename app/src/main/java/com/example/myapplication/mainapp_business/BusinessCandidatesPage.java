@@ -60,6 +60,7 @@ public class BusinessCandidatesPage extends Fragment {
         return pageui;
     }
 
+    // טוען את כל המשתמשים מפיירסטור ומסנן רק מחפשי עבודה
     private void loadCandidates() {
         AlertDialog loading = functions.showLoading(this, "Loading candidates...");
         FirebaseFirestore.getInstance().collection("users")
@@ -86,6 +87,7 @@ public class BusinessCandidatesPage extends Fragment {
                 });
     }
 
+    // בודק אם החשבון הוא של עסק (כדי לסנן אותו מהרשימה)
     private boolean isBusinessAccount(DocumentSnapshot doc) {
         String type = functions.getValue(
                 doc.getString("Account Type"),
@@ -99,6 +101,7 @@ public class BusinessCandidatesPage extends Fragment {
         return bizName != null && !bizName.trim().isEmpty();
     }
 
+    // בונה אובייקט Candidate מהמסמך של המשתמש
     private Candidate mapCandidate(DocumentSnapshot doc) {
         String name = functions.getValue(doc.getString("FullName"), doc.getString("Name"), "");
         if (name.trim().isEmpty()) {
@@ -118,6 +121,7 @@ public class BusinessCandidatesPage extends Fragment {
         return c;
     }
 
+    // מסנן את הרשימה לפי החיפוש
     private void applyFilter() {
         filtered.clear();
         if (currentQuery.isEmpty()) {
@@ -135,6 +139,7 @@ public class BusinessCandidatesPage extends Fragment {
         emptyState.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
+    // פותח את חלון שליחת ההצעה
     private void openOfferDialog(Candidate candidate) {
         OfferDialog.newInstance(candidate.id, candidate.name)
                 .show(getChildFragmentManager(), "offer_dialog");

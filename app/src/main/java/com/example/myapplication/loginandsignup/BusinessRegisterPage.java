@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,18 +15,25 @@ import androidx.fragment.app.Fragment;
 
 import com.example.myapplication.R;
 import com.example.myapplication.functions;
+import com.example.myapplication.mainapp_jobseeker.LocationPickerDialog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class BusinessRegisterPage extends Fragment {
+public class BusinessRegisterPage extends Fragment
+        implements LocationPickerDialog.LocationSelectionListener {
+
+    private TextView addressDisplay;
+    private double businessLat = 0d;
+    private double businessLng = 0d;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//      get the current page ui to show in the frame layout
         View pageui = inflater.inflate(R.layout._signup_bussiness_register__third_b_, container, false);
-        Button full, half, temp, confirm, daily, hourly;
-        EditText name, size, address, email, phone, pay;
+        Button full, half, temp, confirm, daily, hourly, setLocation;
+        EditText name, email, phone, pay;
         functions PressedCheck = new functions();
 
         full = pageui.findViewById(R.id.fulltime);
@@ -35,61 +43,104 @@ public class BusinessRegisterPage extends Fragment {
         daily = pageui.findViewById(R.id.daily);
         hourly = pageui.findViewById(R.id.hourly);
         name = pageui.findViewById(R.id.businessName);
-        size = pageui.findViewById(R.id.businessSize);
-        address = pageui.findViewById(R.id.businessAddress);
+        addressDisplay = pageui.findViewById(R.id.businessAddress);
+        setLocation = pageui.findViewById(R.id.setBusinessLocationButton);
         email = pageui.findViewById(R.id.businessEmail);
         phone = pageui.findViewById(R.id.businessPhone);
         pay = pageui.findViewById(R.id.payrate);
 
-        //        needs
+        // hiring needs - אפשר לבחור כמה
         PressedCheck.pressed(full);
         PressedCheck.pressed(half);
         PressedCheck.pressed(temp);
 
-        //        pay
-        PressedCheck.pressed(daily);
-        PressedCheck.pressed(hourly);
+        // pay rate - רק אחד מהשניים
+        final Button dailyBtn = daily;
+        final Button hourlyBtn = hourly;
+        functions.styleButton(dailyBtn, false);
+        functions.styleButton(hourlyBtn, false);
+        dailyBtn.setOnClickListener(v -> {
+            boolean willSelect = !dailyBtn.isSelected();
+            functions.styleButton(dailyBtn, willSelect);
+            if (willSelect) functions.styleButton(hourlyBtn, false);
+        });
+        hourlyBtn.setOnClickListener(v -> {
+            boolean willSelect = !hourlyBtn.isSelected();
+            functions.styleButton(hourlyBtn, willSelect);
+            if (willSelect) functions.styleButton(dailyBtn, false);
+        });
 
-        //go to next fragment
+        // פתיחת המפה של גוגל לבחירת מיקום העסק
+        setLocation.setOnClickListener(v ->
+                LocationPickerDialog.newInstance(
+                        businessLat == 0d ? null : businessLat,
+                        businessLng == 0d ? null : businessLng,
+                        10d
+                ).show(getChildFragmentManager(), "business_location_picker"));
+
         confirm.setOnClickListener(view -> {
-            //needs list
             List<String> selectedneeds = new ArrayList<>();
             if (full.isSelected()) selectedneeds.add("Full-Time");
             if (half.isSelected()) selectedneeds.add("Half-Time");
             if (temp.isSelected()) selectedneeds.add("Temporary");
 
-            //pay list
             List<String> selectedpay = new ArrayList<>();
-            if (daily.isSelected()) selectedpay.add("Daily Pay");
-            if (hourly.isSelected()) selectedpay.add("Hourly Pay");
+            if (dailyBtn.isSelected()) selectedpay.add("Daily Pay");
+            if (hourlyBtn.isSelected()) selectedpay.add("Hourly Pay");
 
             String nameText = name.getText().toString();
-            String sizeText = size.getText().toString();
-            String addressText = address.getText().toString();
             String emailText = email.getText().toString();
             String phoneText = phone.getText().toString();
             String payText = pay.getText().toString();
 
-            // sending to next fragment
+            // בודק שהמיקום נבחר
+            if (businessLat == 0d && businessLng == 0d) {
+                Toast.makeText(getActivity(), "Please pick your business location on the map.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String addressText = String.format(Locale.US, "%.5f, %.5f", businessLat, businessLng);
+
             Bundle bundle = new Bundle();
             bundle.putString("AccountType", "Business");
             bundle.putString("Name", nameText);
-            bundle.putString("Size", sizeText);
             bundle.putString("Address", addressText);
+            bundle.putDouble("Latitude", businessLat);
+            bundle.putDouble("Longitude", businessLng);
             bundle.putString("Email", emailText);
             bundle.putString("Phone", phoneText);
             bundle.putString("Pay", payText);
             bundle.putStringArrayList("HiringNeeds", new ArrayList<>(selectedneeds));
             bundle.putStringArrayList("PayRate", new ArrayList<>(selectedpay));
+
+            // ולידציה - בלי number of employees, עם מיקום במקום כתובת טקסט
             if (functions.Businessfilled(nameText, emailText, addressText,
-                    sizeText, payText, new ArrayList<>(selectedneeds), new ArrayList<>(selectedpay))) {
+                    "1", payText, new ArrayList<>(selectedneeds), new ArrayList<>(selectedpay))) {
                 functions.move(this, new BusinessRegisterPassword(), bundle);
-            }
-            else {
+            } else {
                 Toast.makeText(getActivity(), "Fill All The Information!", Toast.LENGTH_SHORT).show();
             }
         });
 
         return pageui;
+    }
+
+    // נקרא כשהמשתמש בחר נקודה במפה
+    @Override
+    public void onLocationSelected(double latitude, double longitude, double radiusKm) {
+        businessLat = latitude;
+        businessLng = longitude;
+        if (addressDisplay != null) {
+            addressDisplay.setText(String.format(Locale.US, "Selected: %.5f, %.5f", latitude, longitude));
+        }
+    }
+
+    @Override
+    public void onLocationCleared() {
+        businessLat = 0d;
+        businessLng = 0d;
+        if (addressDisplay != null) {
+            addressDisplay.setText("Location not selected");
+        }
     }
 }

@@ -22,19 +22,19 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.myapplication.R;
 import com.example.myapplication.functions;
-
-import org.osmdroid.config.Configuration;
-import org.osmdroid.events.MapEventsReceiver;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.MapEventsOverlay;
-import org.osmdroid.views.overlay.Marker;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Locale;
 
-public class LocationPickerDialog extends DialogFragment {
+public class LocationPickerDialog extends DialogFragment implements OnMapReadyCallback {
 
+    // ממשק חזרה — איך הדיאלוג מחזיר תוצאה ל-fragment שפתח אותו
     public interface LocationSelectionListener {
         void onLocationSelected(double latitude, double longitude, double radiusKm);
         void onLocationCleared();
@@ -43,15 +43,18 @@ public class LocationPickerDialog extends DialogFragment {
     private static final String ARG_LATITUDE = "latitude";
     private static final String ARG_LONGITUDE = "longitude";
     private static final String ARG_RADIUS = "radius";
-    private static final GeoPoint DEFAULT_CENTER = new GeoPoint(32.0853, 34.7818);
+    // נקודת ברירת מחדל — תל אביב
+    private static final LatLng DEFAULT_CENTER = new LatLng(32.0853, 34.7818);
 
     private MapView mapView;
+    private GoogleMap googleMap;
     private Marker selectedMarker;
-    private GeoPoint selectedPoint;
+    private LatLng selectedPoint;
     private TextView selectedLocationText;
     private EditText radiusInput;
     private LocationListener activeLocationListener;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    // אם לוקח יותר מ-8 שניות לקבל מיקום — מנסים fallback למיקום אחרון ידוע
     private final Runnable locationTimeoutRunnable = () -> {
         if (activeLocationListener != null) {
             stopLocationUpdates();
@@ -64,6 +67,7 @@ public class LocationPickerDialog extends DialogFragment {
         }
     };
 
+    // launcher של בקשת הרשאת מיקום
     private final ActivityResultLauncher<String> locationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
                 if (granted) {
@@ -73,6 +77,7 @@ public class LocationPickerDialog extends DialogFragment {
                 }
             });
 
+    // יצירת הדיאלוג עם פרמטרים (מיקום קודם אם יש, ורדיוס)
     public static LocationPickerDialog newInstance(@Nullable Double latitude, @Nullable Double longitude, double radiusKm) {
         LocationPickerDialog dialog = new LocationPickerDialog();
         Bundle args = new Bundle();
@@ -87,7 +92,6 @@ public class LocationPickerDialog extends DialogFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Configuration.getInstance().setUserAgentValue(requireContext().getPackageName());
         return inflater.inflate(R.layout.dialog_location_picker, container, false);
     }
 
@@ -95,7 +99,7 @@ public class LocationPickerDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//      assign things
+        // חיבור הרכיבים מה-XML
         selectedLocationText = view.findViewById(R.id.selectedLocationText);
         radiusInput = view.findViewById(R.id.radiusInput);
         Button applyButton = view.findViewById(R.id.applyLocationButton);
@@ -106,7 +110,10 @@ public class LocationPickerDialog extends DialogFragment {
         double radiusKm = getArguments() == null ? 10d : getArguments().getDouble(ARG_RADIUS, 10d);
         radiusInput.setText(String.format(Locale.US, "%.0f", radiusKm));
 
-        setupMap();
+        // אתחול המפה של גוגל — חובה לקרוא onCreate ואז getMapAsync
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
+
         applyButton.setOnClickListener(v -> applySelection());
         currentLocationButton.setOnClickListener(v -> requestCurrentLocation());
         clearButton.setOnClickListener(v -> {
@@ -117,77 +124,48 @@ public class LocationPickerDialog extends DialogFragment {
         });
     }
 
+    // נקרא כשהמפה מוכנה לשימוש (אסינכרוני)
     @Override
-    public void onResume() {
-        super.onResume();
-        if (mapView != null) {
-            mapView.onResume();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        stopLocationUpdates();
-        if (mapView != null) {
-            mapView.onPause();
-        }
-        super.onPause();
-    }
-
-    private void setupMap() {
+    public void onMapReady(@NonNull GoogleMap map) {
+        googleMap = map;
         selectedPoint = readInitialPoint();
 
-//      open street map settings
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.setMultiTouchControls(true);
-        mapView.getController().setZoom(11.0);
-        mapView.getController().setCenter(selectedPoint);
+        // מציב את המצלמה על הנקודה ההתחלתית
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedPoint, 11f));
 
-        MapEventsReceiver receiver = new MapEventsReceiver() {
-            @Override
-            public boolean singleTapConfirmedHelper(GeoPoint point) {
-                selectedPoint = point;
-                renderMarker(point);
-                return true;
-            }
+        // לחיצה על המפה בוחרת נקודה חדשה
+        googleMap.setOnMapClickListener(latLng -> {
+            selectedPoint = latLng;
+            renderMarker(latLng);
+        });
 
-            @Override
-            public boolean longPressHelper(GeoPoint point) {
-                selectedPoint = point;
-                renderMarker(point);
-                return true;
-            }
-        };
-        mapView.getOverlays().add(new MapEventsOverlay(receiver));
         renderMarker(selectedPoint);
     }
 
-    private GeoPoint readInitialPoint() {
+    // קוראים את הנקודה ההתחלתית מ-arguments, אם לא קיימת — תל אביב
+    private LatLng readInitialPoint() {
         Bundle args = getArguments();
         if (args != null && args.containsKey(ARG_LATITUDE) && args.containsKey(ARG_LONGITUDE)) {
-            return new GeoPoint(args.getDouble(ARG_LATITUDE), args.getDouble(ARG_LONGITUDE));
+            return new LatLng(args.getDouble(ARG_LATITUDE), args.getDouble(ARG_LONGITUDE));
         }
         return DEFAULT_CENTER;
     }
 
-    private void renderMarker(GeoPoint point) {
-        if (mapView == null || point == null) {
+    // מסיר Marker קודם אם קיים ומציב חדש בנקודה
+    private void renderMarker(LatLng point) {
+        if (googleMap == null || point == null) {
             return;
         }
-
         if (selectedMarker != null) {
-            mapView.getOverlays().remove(selectedMarker);
+            selectedMarker.remove();
         }
-
-        selectedMarker = new Marker(mapView);
-        selectedMarker.setPosition(point);
-        selectedMarker.setTitle("Search center");
-        selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        mapView.getOverlays().add(selectedMarker);
-        mapView.invalidate();
-        selectedLocationText.setText(String.format(Locale.US, "Selected: %.5f, %.5f", point.getLatitude(), point.getLongitude()));
+        selectedMarker = googleMap.addMarker(new MarkerOptions()
+                .position(point)
+                .title("Search center"));
+        selectedLocationText.setText(String.format(Locale.US, "Selected: %.5f, %.5f", point.latitude, point.longitude));
     }
 
+    // בודק אם יש הרשאה ל-FINE_LOCATION; אם לא — מבקש
     private void requestCurrentLocation() {
         if (getContext() == null) {
             return;
@@ -199,14 +177,11 @@ public class LocationPickerDialog extends DialogFragment {
         locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
+    // מבקש מיקום נוכחי (חד פעמי)
     private void useCurrentLocation() {
-        if (getContext() == null) {
+        if (getContext() == null || !functions.hasLocationPermission(requireContext())) {
             return;
         }
-        if (!functions.hasLocationPermission(requireContext())) {
-            return;
-        }
-
         stopLocationUpdates();
 
         activeLocationListener = location -> {
@@ -236,37 +211,79 @@ public class LocationPickerDialog extends DialogFragment {
             activeLocationListener = null;
             return;
         }
-
         functions.stopLocation(requireContext(), activeLocationListener);
         activeLocationListener = null;
     }
 
+    // מקבל את המיקום של המשתמש וזז אליו במפה
     private void moveToDeviceLocation(Location location) {
         if (location == null) {
             return;
         }
-
-        selectedPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-        if (mapView != null) {
-            mapView.getController().animateTo(selectedPoint);
-            mapView.getController().setZoom(12.0);
+        selectedPoint = new LatLng(location.getLatitude(), location.getLongitude());
+        if (googleMap != null) {
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedPoint, 12f));
         }
         renderMarker(selectedPoint);
     }
 
+    // שולח חזרה את הנקודה והרדיוס ל-fragment שפתח את הדיאלוג
     private void applySelection() {
         if (!(getParentFragment() instanceof LocationSelectionListener) || selectedPoint == null) {
             dismiss();
             return;
         }
-
         double radiusKm = functions.firstDouble(radiusInput.getText().toString());
         if (radiusKm <= 0d) {
             radiusKm = 10d;
         }
-
         ((LocationSelectionListener) getParentFragment())
-                .onLocationSelected(selectedPoint.getLatitude(), selectedPoint.getLongitude(), radiusKm);
+                .onLocationSelected(selectedPoint.latitude, selectedPoint.longitude, radiusKm);
         dismiss();
+    }
+
+    // ====== מחזור החיים של MapView — חובה ב-Google Maps ======
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mapView != null) mapView.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mapView != null) mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        stopLocationUpdates();
+        if (mapView != null) mapView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        if (mapView != null) mapView.onStop();
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (mapView != null) mapView.onDestroy();
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mapView != null) mapView.onLowMemory();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mapView != null) mapView.onSaveInstanceState(outState);
     }
 }

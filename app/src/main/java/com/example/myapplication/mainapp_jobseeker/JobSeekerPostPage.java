@@ -36,7 +36,6 @@ public class JobSeekerPostPage extends Fragment {
     private EditText fieldsInput;
     private TextView resumeNameText;
     private TextView resumeHintText;
-    private String selectedType = "";
     private String profileImageUri = "";
     private String resumeUri = "";
     private String resumeName = "";
@@ -93,9 +92,13 @@ public class JobSeekerPostPage extends Fragment {
         uploadArea.setOnClickListener(v -> photo.show());
         uploadResume.setOnClickListener(v -> resumePickerLauncher.launch(new String[]{"application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}));
         buildResume.setOnClickListener(v -> functions.moveMain(this, new JobSeekerResumeBuilderPage(), null));
-        fullTimeButton.setOnClickListener(v -> selectType("Full Time"));
-        partTimeButton.setOnClickListener(v -> selectType("Part Time"));
-        temporaryButton.setOnClickListener(v -> selectType("Temporary"));
+        // עכשיו כל כפתור עצמאי - אפשר לבחור כמה שרוצים
+        functions.styleButton(fullTimeButton, false);
+        functions.styleButton(partTimeButton, false);
+        functions.styleButton(temporaryButton, false);
+        fullTimeButton.setOnClickListener(v -> functions.styleButton(fullTimeButton, !fullTimeButton.isSelected()));
+        partTimeButton.setOnClickListener(v -> functions.styleButton(partTimeButton, !partTimeButton.isSelected()));
+        temporaryButton.setOnClickListener(v -> functions.styleButton(temporaryButton, !temporaryButton.isSelected()));
         saveProfile.setOnClickListener(v -> saveProfile());
 
         loadProfile();
@@ -132,31 +135,20 @@ public class JobSeekerPostPage extends Fragment {
                     }
                     resumeUri = functions.getValue(document.getString("ResumeUri"), "");
                     resumeName = functions.getValue(document.getString("ResumeName"), "");
-                    selectedType = functions.getValue(document.getString("PreferredType"), "");
+
+                    // קורא מה היה שמור ומדליק את הכפתורים המתאימים
+                    String savedTypes = functions.getValue(document.getString("PreferredType"), "");
+                    functions.styleButton(fullTimeButton, savedTypes.contains("Full Time"));
+                    functions.styleButton(partTimeButton, savedTypes.contains("Part Time"));
+                    functions.styleButton(temporaryButton, savedTypes.contains("Temporary"));
 
                     resumeNameText.setText(functions.getResumeLabel(document));
                     updateResumeHint(document);
-                    updateTypeButtons();
                 })
                 .addOnFailureListener(e -> {
                     functions.hideLoading(loading);
                     Toast.makeText(getContext(), "Failed to load profile.", Toast.LENGTH_SHORT).show();
                 });
-    }
-
-    private void selectType(String type) {
-        if (type.equals(selectedType)) {
-            selectedType = "";
-        } else {
-            selectedType = type;
-        }
-        updateTypeButtons();
-    }
-
-    private void updateTypeButtons() {
-        functions.styleButton(fullTimeButton, "Full Time".equals(selectedType));
-        functions.styleButton(partTimeButton, "Part Time".equals(selectedType));
-        functions.styleButton(temporaryButton, "Temporary".equals(selectedType));
     }
 
     private void saveProfile() {
@@ -176,7 +168,20 @@ public class JobSeekerPostPage extends Fragment {
         data.put("Bio", aboutInput.getText().toString().trim());
         data.put("DesiredPay", payInput.getText().toString().trim());
         data.put("PreferredFields", fieldsInput.getText().toString().trim());
-        data.put("PreferredType", selectedType);
+
+        // אוסף את כל הסוגים שנבחרו לתוך מחרוזת אחת מופרדת בפסיק
+        StringBuilder types = new StringBuilder();
+        if (fullTimeButton.isSelected()) types.append("Full Time");
+        if (partTimeButton.isSelected()) {
+            if (types.length() > 0) types.append(", ");
+            types.append("Part Time");
+        }
+        if (temporaryButton.isSelected()) {
+            if (types.length() > 0) types.append(", ");
+            types.append("Temporary");
+        }
+        data.put("PreferredType", types.toString());
+
         data.put("ProfileImageUri", profileImageUri);
         data.put("ResumeUri", resumeUri);
         data.put("ResumeName", resumeName);

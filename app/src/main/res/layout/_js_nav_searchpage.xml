@@ -38,35 +38,35 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/fulltime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
-                android:backgroundTint="@color/indigo_50"
-                android:textColor="@color/gray_900"
+                android:paddingHorizontal="18dp"
+                android:text="Full Time"
                 android:textAllCaps="false"
-                android:text="Full Time" />
+                android:textSize="13sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/parttime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
-                android:backgroundTint="@color/indigo_50"
-                android:textColor="@color/gray_900"
+                android:paddingHorizontal="18dp"
+                android:text="Part-Time"
                 android:textAllCaps="false"
-                android:text="Part-Time" />
+                android:textSize="13sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
-                android:backgroundTint="@color/indigo_50"
-                android:textColor="@color/gray_900"
+                android:paddingHorizontal="18dp"
+                android:text="Temporary"
                 android:textAllCaps="false"
-                android:text="Temporary" />
+                android:textSize="13sp" />
         </LinearLayout>
     </HorizontalScrollView>
 

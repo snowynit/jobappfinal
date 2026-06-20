@@ -33,51 +33,43 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/filterAll"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:backgroundTint="@color/indigo_50"
                 android:paddingHorizontal="18dp"
                 android:text="All"
                 android:textAllCaps="false"
-                android:textColor="@color/gray_900"
                 android:textSize="13sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/filterPending"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="8dp"
-                android:backgroundTint="@color/indigo_50"
                 android:paddingHorizontal="18dp"
                 android:text="Pending"
                 android:textAllCaps="false"
-                android:textColor="@color/gray_900"
                 android:textSize="13sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/filterAccepted"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="8dp"
-                android:backgroundTint="@color/indigo_50"
                 android:paddingHorizontal="18dp"
                 android:text="Accepted"
                 android:textAllCaps="false"
-                android:textColor="@color/gray_900"
                 android:textSize="13sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/filterRejected"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="8dp"
-                android:backgroundTint="@color/indigo_50"
                 android:paddingHorizontal="18dp"
                 android:text="Rejected"
                 android:textAllCaps="false"
-                android:textColor="@color/gray_900"
                 android:textSize="13sp" />
         </LinearLayout>
     </HorizontalScrollView>

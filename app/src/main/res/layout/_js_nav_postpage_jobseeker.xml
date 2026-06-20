@@ -147,32 +147,35 @@
                         android:layout_marginTop="6dp"
                         android:orientation="horizontal">
 
-                        <Button
+                        <androidx.appcompat.widget.AppCompatButton
                             android:id="@+id/fulltime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="4dp"
-                            android:backgroundTint="@color/primaryBlue"
+                            android:paddingHorizontal="18dp"
                             android:text="Full Time"
-                            android:textSize="12sp" />
+                            android:textAllCaps="false"
+                            android:textSize="13sp" />
 
-                        <Button
+                        <androidx.appcompat.widget.AppCompatButton
                             android:id="@+id/parttime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="4dp"
-                            android:backgroundTint="@color/primaryBlue"
+                            android:paddingHorizontal="18dp"
                             android:text="Part-Time"
-                            android:textSize="12sp" />
+                            android:textAllCaps="false"
+                            android:textSize="13sp" />
 
-                        <Button
+                        <androidx.appcompat.widget.AppCompatButton
                             android:id="@+id/temp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="4dp"
-                            android:backgroundTint="@color/primaryBlue"
+                            android:paddingHorizontal="18dp"
                             android:text="Temporary"
-                            android:textSize="12sp" />
+                            android:textAllCaps="false"
+                            android:textSize="13sp" />
                     </LinearLayout>
 
                     <EditText
@@ -251,7 +254,7 @@
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
                 android:backgroundTint="#006CEF"
-                android:text="Create Profile"
+                android:text="Save Changes"
                 android:textColor="#FFFFFF" />
 
         </LinearLayout>

@@ -35,6 +35,7 @@ public class CameraSupport {
     private final ActivityResultLauncher<Uri> cameraLauncher;
     private final ActivityResultLauncher<String> permissionLauncher;
 
+    // רושם את ה-launchers של המצלמה, הגלריה וההרשאות (חייב להיות בפתיחת ה-Fragment)
     public CameraSupport(Fragment fragment, OnPick callback) {
         this.fragment = fragment;
         this.callback = callback;
@@ -57,7 +58,7 @@ public class CameraSupport {
                 granted -> { if (granted) launchCamera(); });
     }
 
-    /** Show the "Take Photo / Choose from Gallery" chooser. */
+    // מציג חלון לבחירה בין מצלמה לגלריה
     public void show() {
         if (fragment.getContext() == null) return;
         new AlertDialog.Builder(fragment.requireContext())
@@ -74,12 +75,14 @@ public class CameraSupport {
                 .show();
     }
 
+    // בודק אם נתנו הרשאה למצלמה
     private boolean hasCameraPermission() {
         return ContextCompat.checkSelfPermission(
                 fragment.requireContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    // מכין קובץ זמני דרך FileProvider ופותח את המצלמה
     private void launchCamera() {
         if (fragment.getContext() == null) return;
         File dir = new File(fragment.requireContext().getCacheDir(), "camera");
